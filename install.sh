@@ -5,7 +5,7 @@ PURPLE="\e[36m"
 ENDCOLOR="\e[0m"
 
 curl -s https://raw.githubusercontent.com/nodeLogs/main/main/nodelogo.sh | bash
-echo "${PURPLE}Устанавливаем необходимый софт${ENDCOLOR}"
+echo -e "${PURPLE}Устанавливаем необходимый софт${ENDCOLOR}"
 curl -s https://raw.githubusercontent.com/razumv/helpers/main/tools/install_ufw.sh | bash &>/dev/null
 curl -s https://raw.githubusercontent.com/razumv/helpers/main/tools/install_rust.sh | bash &>/dev/null
 source ~/.cargo/env
@@ -15,11 +15,11 @@ echo -e "${PURPLE}Копируем Репозиторий${ENDCOLOR}"
 git clone https://github.com/penumbra-zone/penumbra
 cd $HOME/penumbra && git checkout 005-mneme
 echo -e "${GREEN}Репозиторий успешно склонирован${ENDCOLOR}"
-echo -e "${PURPLE}Начинаем билд, ожидайте{ENDCOLOR}"
+echo -e "${PURPLE}Начинаем билд, ожидайте${ENDCOLOR}"
 cd $HOME/penumbra/
 cargo build --release --bin pcli
 echo -e "${GREEN}Билд закончен${ENDCOLOR}"
-echo -e "${PURPLE}Создаем кошлек{ENDCOLOR}"
+echo -e "${PURPLE}Создаем кошлек${ENDCOLOR}"
 cd $HOME/penumbra/
 cargo run --quiet --release --bin pcli wallet generate
 echo -e "${GREEN}Кошелек успешно создан${ENDCOLOR}"
