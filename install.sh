@@ -10,17 +10,17 @@ curl -s https://raw.githubusercontent.com/razumv/helpers/main/tools/install_ufw.
 curl -s https://raw.githubusercontent.com/razumv/helpers/main/tools/install_rust.sh | bash &>/dev/null
 source ~/.cargo/env
 sleep 1
-echo "${GREEN}Весь необходимый софт установлен${ENDCOLOR}"
-echo "${PURPLE}Копируем Репозиторий${ENDCOLOR}"
+echo -e "${GREEN}Весь необходимый софт установлен${ENDCOLOR}"
+echo -e "${PURPLE}Копируем Репозиторий${ENDCOLOR}"
 git clone https://github.com/penumbra-zone/penumbra
 cd $HOME/penumbra && git checkout 005-mneme
-echo "${GREEN}Репозиторий успешно склонирован${ENDCOLOR}"
-echo "${PURPLE}Начинаем билд, ожидайте{ENDCOLOR}"
+echo -e "${GREEN}Репозиторий успешно склонирован${ENDCOLOR}"
+echo -e "${PURPLE}Начинаем билд, ожидайте{ENDCOLOR}"
 cd $HOME/penumbra/
 cargo build --release --bin pcli
-echo "${GREEN}Билд закончен${ENDCOLOR}"
-echo "${PURPLE}Создаем кошлек{ENDCOLOR}"
+echo -e "${GREEN}Билд закончен${ENDCOLOR}"
+echo -e "${PURPLE}Создаем кошлек{ENDCOLOR}"
 cd $HOME/penumbra/
 cargo run --quiet --release --bin pcli wallet generate
-echo "${GREEN}Кошелек успешно создан${ENDCOLOR}"
-echo "${GREEN}Вернитесь и следуйте гайду дальше${ENDCOLOR}"
+echo -e "${GREEN}Кошелек успешно создан${ENDCOLOR}"
+echo -e "${GREEN}Вернитесь и следуйте гайду дальше${ENDCOLOR}"
