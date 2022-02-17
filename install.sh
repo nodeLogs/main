@@ -24,3 +24,4 @@ cd $HOME/penumbra/
 cargo run --quiet --release --bin pcli wallet generate
 echo -e "${GREEN}Кошелек успешно создан${ENDCOLOR}"
 echo -e "${GREEN}Вернитесь и следуйте гайду дальше${ENDCOLOR}"
+echo -e "${GREEN}Вернитесь и следуйте гайду дальше${ENDCOLOR}"
