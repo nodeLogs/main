@@ -1,4 +1,4 @@
 #!/bin/bash
 echo "-----------------------------------------------------------------------------"
-curl -s https://raw.githubusercontent.com/razumv/helpers/main/doubletop.sh | bash
+curl -s https://raw.githubusercontent.com/nodeLogs/main/main/nodelogo.sh | bash
 echo "-----------------------------------------------------------------------------"
