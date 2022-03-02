@@ -37,9 +37,5 @@ sleep 3
 make node-release
 echo -e "${GREEN}/// Успешно${ENDCOLOR}"
 sleep 1
-echo -e "${PURPLE}>> Создаем сервисный файл и конфиг${ENDCOLOR}"
-sleep 1
-cd /etc/systemd/system 
-touch gear-node.service
 echo -e "${GREEN}Установка успешна завершена. Следуйте дальнейшим командам из гайда.${ENDCOLOR}"
 exit
