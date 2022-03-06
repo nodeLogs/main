@@ -30,7 +30,6 @@ while test $# -gt 0; do
 		echo
 		echo -e "${C_LGn}Useful URLs${RES}:"
 		echo -e "https://github.com/SecorD0/Massa/blob/main/multi_tool.sh - script URL"
-		echo -e "https://t.me/letskynode — node Community"
 		echo
 		return 0
 		;;
