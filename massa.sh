@@ -100,7 +100,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/massad.service
 		sudo cp $HOME/massa_backup/wallet.dat $HOME/massa/massa-client/wallet.dat
 		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/Massa/main/insert_variables.sh)
 		cd
-		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/logo.sh)
+		. <(wget -qO- https://raw.githubusercontent.com/nodeLogs/main/main/nodelogo.sh)
 		printf_n "
 The node was ${C_LGn}updated${RES}.
 
@@ -166,7 +166,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/massad.service
 			fi
 			printf_n "${C_LGn}Done!${RES}"
 			cd
-			. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/logo.sh)
+			. <(wget -qO- https://raw.githubusercontent.com/nodeLogs/main/main/nodelogo.sh)
 			printf_n "
 The node was ${C_LGn}started${RES}.
 
@@ -230,7 +230,7 @@ ${C_LGn}Client installation...${RES}
 	fi
 	printf_n "${C_LGn}Done!${RES}"
 	cd
-	. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/logo.sh)
+	. <(wget -qO- https://raw.githubusercontent.com/nodeLogs/main/main/nodelogo.sh)
 	printf_n "
 The node was ${C_LGn}started${RES}.
 
@@ -266,6 +266,6 @@ uninstall() {
 
 # Actions
 sudo apt install wget -y &>/dev/null
-. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/logo.sh)
+. <(wget -qO- https://raw.githubusercontent.com/nodeLogs/main/main/nodelogo.sh)
 cd
 $function
