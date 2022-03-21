@@ -2,65 +2,113 @@
 RED="\e[31m"
 GREEN="\e[32m"
 PURPLE="\e[36m"
-ENDCOLOR="\e[0m"
+ENDCOLOR="${ENDCOLOR}"
 
-exists()
-{
-  command -v "$1" >/dev/null 2>&1
-}
-if exists curl; then
-	echo ''
-else
-  sudo apt install curl -y < "/dev/null"
-fi
+
 curl -s https://raw.githubusercontent.com/nodeLogs/main/main/nodelogo.sh | bash && sleep 3
-echo -e "${PURPLE}>> Установка ноды${ENDCOLOR}"
-echo -e "${PURPLE}>> Дождитесь завершения установки${ENDCOLOR}"
-sudo apt update && sudo apt install git -y
+echo -e "${PURPLE}>> Установка зависимостей ${ENDCOLOR}" && sleep 1
+sudo apt-get update & sudo apt-get install git -y
 cd $HOME
 rm -rf aptos-core
-sudo mkdir -p /opt/aptos/data .aptos/config .aptos/key
+rm /usr/local/bin/aptos*
+sudo mkdir -p /opt/aptos/data aptos aptos/identity
+
+echo "=================================================="
+
+echo -e "\e[1m\e[32m2. Cloning github repo... ${ENDCOLOR}" && sleep 1
 git clone https://github.com/aptos-labs/aptos-core.git
 cd aptos-core
-git checkout origin/devnet &>/dev/null
+git checkout origin/devnet &> /dev/null
+cp $HOME/aptos-core/config/src/config/test_data/public_full_node.yaml $HOME/aptos
+wget -P $HOME/aptos https://devnet.aptoslabs.com/genesis.blob
+wget -P $HOME/aptos https://devnet.aptoslabs.com/waypoint.txt
+sed -i.bak 's/\(from_config: \).*/\1"'$(cat $HOME/aptos/waypoint.txt)'"/g' $HOME/aptos/public_full_node.yaml
+sed -i '/genesis_file_location: /c\    genesis_file_location: "'$HOME/aptos/genesis.blob'"' $HOME/aptos/public_full_node.yaml
+
+echo "=================================================="
+
+echo -e "${PURPLE}>> Установка необходимых зависимостей Aptos... ${ENDCOLOR}" && sleep 1
 echo y | ./scripts/dev_setup.sh
 source ~/.cargo/env
+
+echo "=================================================="
+
+echo -e "${PURPLE}>> Компиляция Aptos... ${ENDCOLOR}" && sleep 1
 cargo build -p aptos-node --release
+
+echo "=================================================="
+
+echo -e "${PURPLE}>> Компиляция aptos-операционный инструмент ... ${ENDCOLOR}" && sleep 1
 cargo build -p aptos-operational-tool --release
-mv ~/aptos-core/target/release/aptos-node /usr/local/bin
-mv ~/aptos-core/target/release/aptos-operational-tool /usr/local/bin
-/usr/local/bin/aptos-operational-tool generate-key --encoding hex --key-type x25519 --key-file ~/.aptos/key/private-key.txt
-/usr/local/bin/aptos-operational-tool extract-peer-from-file --encoding hex --key-file ~/.aptos/key/private-key.txt --output-file ~/.aptos/config/peer-info.yaml &>/dev/null
-cp ~/aptos-core/config/src/config/test_data/public_full_node.yaml ~/.aptos/config
-wget -O /opt/aptos/data/genesis.blob https://devnet.aptoslabs.com/genesis.blob
-wget -q -O ~/.aptos/waypoint.txt https://devnet.aptoslabs.com/waypoint.txt
-WAYPOINT=$(cat ~/.aptos/waypoint.txt)
-PRIVKEY=$(cat ~/.aptos/key/private-key.txt)
-PEER=$(sed -n 2p ~/.aptos/config/peer-info.yaml | sed 's/.$//')
-sed -i.bak "s/0:01234567890ABCDEFFEDCA098765421001234567890ABCDEFFEDCA0987654210/$WAYPOINT/" $HOME/.aptos/config/public_full_node.yaml
-sed -i.bak -e "s/genesis_file_location: .*/genesis_file_location: \"\/opt\/aptos\/data\/genesis.blob\"/" $HOME/.aptos/config/public_full_node.yaml
-sed -i '/      network_id: "public"$/a\
+
+echo "=================================================="
+
+echo -e "${PURPLE}>> Перемещаем aptos-node в /usr/local/bin/aptos-node ... ${ENDCOLOR}" && sleep 1
+mv $HOME/aptos-core/target/release/aptos-node /usr/local/bin
+
+echo "=================================================="
+
+echo -e "${PURPLE}>> Перемещаем aptos-operational-tool в /usr/local/bin/aptos-operational-tool ... ${ENDCOLOR}" && sleep 1
+mv $HOME/aptos-core/target/release/aptos-operational-tool /usr/local/bin
+
+echo "=================================================="
+
+echo -e "${PURPLE}>> Создание уникального идентификатора ноды ... ${ENDCOLOR}" && sleep 1
+
+/usr/local/bin/aptos-operational-tool generate-key --encoding hex --key-type x25519 --key-file $HOME/aptos/identity/private-key.txt &> /dev/null
+/usr/local/bin/aptos-operational-tool extract-peer-from-file --encoding hex --key-file $HOME/aptos/identity/private-key.txt --output-file $HOME/aptos/identity/peer-info.yaml > $HOME/aptos/identity/id.json
+PEER_ID=$(sed -n 2p $HOME/aptos/identity/peer-info.yaml | sed 's/.$//')
+PRIVATE_KEY=$(cat $HOME/aptos/identity/private-key.txt)
+sed -i '/discovery_method: "onchain"$/a\
       identity:\
           type: "from_config"\
-          key: "'$PRIVKEY'"\
-          peer_id: "'$PEER'"' $HOME/.aptos/config/public_full_node.yaml
+          key: "'$PRIVATE_KEY'"\
+          peer_id: "'$PEER_ID'"' $HOME/aptos/public_full_node.yaml
 
+
+echo "=================================================="
+
+echo -e "${PURPLE}>> Создание systemctl службы ... ${ENDCOLOR}" && sleep 1
 
 echo "[Unit]
-Description=Aptos
-After=network.target
+Description=Subspace Farmer
 
 [Service]
 User=$USER
 Type=simple
-ExecStart=$(which aptos-node) -f $HOME/.aptos/config/public_full_node.yaml
-Restart=on-failure
-LimitNOFILE=65535
+ExecStart=/usr/local/bin/aptos-node --config $HOME/aptos/public_full_node.yaml
+Restart=always
+RestartSec=10
+LimitNOFILE=10000
 
 [Install]
-WantedBy=multi-user.target" > $HOME/aptosd.service
-mv $HOME/aptosd.service /etc/systemd/system/
+WantedBy=multi-user.target
+" > $HOME/aptos-fullnode.service
+mv $HOME/aptos-fullnode.service /etc/systemd/system
+
+echo "=================================================="
+
+echo -e "${PURPLE}>> Запускаем ноду ... ${ENDCOLOR}" && sleep 1
+
 sudo systemctl restart systemd-journald
 sudo systemctl daemon-reload
-sudo systemctl enable aptosd
-sudo systemctl restart aptosd
+sudo systemctl enable aptos-fullnode
+sudo systemctl restart aptos-fullnode
+
+echo "=================================================="
+
+echo -e "${PURPLE}>> Aptos FullNode запущена ${ENDCOLOR}"
+
+echo "=================================================="
+
+echo -e "${GREEN}>>Для остановки Aptos Node: ${ENDCOLOR}" 
+echo -e "${PURPLE}>>    systemctl stop aptos-fullnode \n ${ENDCOLOR}" 
+
+echo -e "${GREEN}>>Для старта Aptos Node: ${ENDCOLOR}" 
+echo -e "${PURPLE}>>    systemctl start aptos-fullnode \n ${ENDCOLOR}" 
+
+echo -e "${GREEN}>>Проверить логи Aptos Node: ${ENDCOLOR}" 
+echo -e "${PURPLE}>>    journalctl -u aptos-fullnode -f \n ${ENDCOLOR}" 
+
+echo -e "${GREEN}>>Проверить статус ноды: ${ENDCOLOR}" 
+echo -e "${PURPLE}>>    curl 127.0.0.1:9101/metrics 2> /dev/null | grep aptos_state_sync_version | grep type \n ${ENDCOLOR}" 
