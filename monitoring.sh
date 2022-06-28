@@ -4,8 +4,12 @@ GREEN="\e[32m"
 PURPLE="\e[36m"
 ENDCOLOR="\e[0m"
 
+curl -s https://raw.githubusercontent.com/nodeLogs/main/main/nodelogo.sh | bash
+sleep 2
+echo -e "${PURPLE}---------------------------------------${ENDCOLOR}"
 echo -e "${PURPLE}>> Installing Prometheus...${ENDCOLOR}"
-sleep 5
+echo -e "${PURPLE}---------------------------------------${ENDCOLOR}"
+sleep 2
 sudo groupadd --system prometheus
 sleep 1
 sudo useradd -s /sbin/nologin --system -g prometheus prometheus
@@ -66,4 +70,7 @@ sleep 1
 for i in rules rules.d files_sd; do sudo chmod -R 775 /etc/prometheus/${i}; done
 sleep 1
 sudo chown -R prometheus:prometheus /var/lib/prometheus/
-echo -e "${GREEN}>> Prometheus has been successfully installed${ENDCOLOR}"
+sleep 1
+sudo systemctl daemon-reload
+sudo systemctl enable prometheus
+echo -e "${PURPLE}>> Prometheus has been successfully installed${ENDCOLOR}"
