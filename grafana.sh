@@ -6,7 +6,7 @@ ENDCOLOR="\e[0m"
 
 sleep 2
 echo -e "${PURPLE}---------------------------------------${ENDCOLOR}"
-echo -e "${PURPLE}>> Installing node_exporter...${ENDCOLOR}"
+echo -e "${PURPLE}>> Installing Grafana...${ENDCOLOR}"
 echo -e "${PURPLE}---------------------------------------${ENDCOLOR}"
 echo -e "${PURPLE}by lateful${ENDCOLOR}"
 sleep 2
@@ -22,4 +22,4 @@ sudo apt-get -y install grafana
 sleep 1
 sudo systemctl enable --now grafana-server
 sleep 1
-echo -e "${PURPLE}>> node_exporter has been successfully installed${ENDCOLOR}"
+echo -e "${PURPLE}>> Grafana has been successfully installed${ENDCOLOR}"
